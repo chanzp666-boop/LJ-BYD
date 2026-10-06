@@ -63,3 +63,7 @@ out/
 !**/src/main/**/rs/**
 !**/src/main/**/shaders/**
 !**/src/main/**/webapp/**
+
+# 签名密钥与构建产物（勿上传）
+*.jks
+*.apk
