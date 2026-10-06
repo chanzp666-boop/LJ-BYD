@@ -1,4 +1,4 @@
-# 垃圾比亚迪（DiPartner 原生转换版）
+# 垃圾比亚迪
 
 一个基于 **纯 Android 原生（Java + XML）** 的车载桌面启动器，由开源项目 [DiPartner](https://gitee.com/hex_code/DiPartner)（比亚迪车机 WebView 混合桌面）**1:1 迁移转换**而来，适配 **骁龙 690 / 8GB 内存 / Android 10（API 29）** 车机平台。
 
