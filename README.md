@@ -1,110 +1,113 @@
-# 垃圾比亚迪 车载桌面系统
+# 垃圾比亚迪（DiPartner 原生转换版）
 
-一个基于 Android 的开源车载桌面启动器，专为车载娱乐系统设计。
-车机桌面不方便，基于自己的使用习惯瞎折腾出来的，小白新学技术有限，希望大佬出手指导，感激不尽。
-- 代码仅限学习交流使用，请下载后及时删除，如有侵权请联系删除。
+一个基于 **纯 Android 原生（Java + XML）** 的车载桌面启动器，由开源项目 [DiPartner](https://gitee.com/hex_code/DiPartner)（比亚迪车机 WebView 混合桌面）**1:1 迁移转换**而来，适配 **骁龙 690 / 8GB 内存 / Android 10（API 29）** 车机平台。
+
+> 原项目使用 WebView + HTML/JS 混合开发；本工程已将所有 UI 与业务逻辑**改为纯原生 Java 实现**（不再依赖 WebView 前端），并在此前基础上补齐了还原度缺口、修复了壁纸切换等 Bug。
+
 ## 功能特性
 
-- 音乐控制组件 - 支持主流音乐播放器的控制和显示
-- 天气显示 - 实时天气信息展示
-- 地图导航快捷入口
-- 车辆信息展示
-- 空调控制面板
-- 壁纸切换系统
-- 快速启动应用
-- 胎压监测显示
+- 桌面主界面（1:1 还原原版布局：时间/农历、底部卡片区、控制栏）
+- 音乐控制组件（MediaSession + 原生可视化频谱、黑胶唱片动画）
+- 天气显示（实时天气信息，联网获取）
+- 地图导航快捷入口（回家/公司一键导航；长按可选择地图应用）
+- 车辆信息展示 / 胎压监测显示
+- 空调控制面板（温度 ±、风量 ±、AC、除霜、HCS）
+- 壁纸系统：轮播、在线分类下载、随机/指定模式
+- **壁纸手势**：左右滑动切换、双击恢复默认、长按删除当前壁纸
+- 快速启动应用（应用列表长按添加、快速应用长按移除）
+- 蓝牙 / Wi-Fi 状态图标实时显示
+- 系统管理（BYD 自启、开机问候、重启应用、设默认桌面、ADB 授权）
 
 ## 技术栈
 
-- **前端**: HTML5 + CSS3 + JavaScript
-- **后端**: Android Java (API 25+)
-- **通信**: WebView Bridge
-- **数据库**: SQLite
+- **语言**：Java（原生 Android，无 WebView 前端依赖）
+- **UI**：XML 布局（FrameLayout/LinearLayout + 自定义 View）
+- **数据**：SQLite（壁纸设置、组件配置、快速应用、车况）
+- **通信**：MediaSession / 系统广播 / ADB Intent 转发（车机控制）
 
 ## 系统要求
 
-- Android 7.1+ (API 25)
-- 建议 Android 9+ 以获得最佳体验
+- Android 10（API 29）及以上
+- 适配：骁龙 690 / 8GB 内存车机
+- 车机控制类功能（空调、胎压、BYD 主页）依赖车机 ADB 服务
 
 ## 快速开始
 
 ### 1. 克隆项目
 
 ```bash
-git clone https://gitee.com/hex_code/DiPartner.git
-cd DiPartner
+git clone https://github.com/chanzp666-boop/LJ-BYD.git
+cd LJ-BYD
 ```
 
 ### 2. 配置环境
 
-- Android Studio 4.2+
-- JDK 11
+- Android Studio（或命令行 Gradle）
+- JDK 17
 - Android SDK 30
 
 ### 3. 构建项目
 
 ```bash
-./gradlew assembleDebug
+export JAVA_HOME="/path/to/jdk-17"
+export ANDROID_HOME=~/Library/Android/sdk
+
+./gradlew assembleDebug   # debug
+./gradlew assembleRelease # release（使用本机保留的 ljbyd.jks 签名）
 ```
 
 ### 4. 安装到设备
 
 ```bash
-adb install app/build/outputs/apk/debug/app-debug.apk
+adb install app/build/outputs/apk/release/app-release.apk
 ```
+
+## 应用信息
+
+| 项目 | 内容 |
+|---|---|
+| 应用名称 | 垃圾比亚迪 |
+| 包名 | com.ljbyd.launcher3 |
+| 版本 | 2.0（versionCode 2） |
+| 签名 | 自签名 V2（ljbyd.jks，密钥文件仅本机保留，不随仓库分发） |
+| 存储目录 | /sdcard/ljbyd（壁纸、配置等） |
 
 ## 项目结构
 
 ```
-DiPartner/
+LJ-BYD/
 ├── app/
 │   ├── src/main/
-│   │   ├── assets/          # Web 前端资源
-│   │   │   ├── css/         # 样式文件
-│   │   │   ├── js/          # JavaScript 文件
-│   │   │   ├── images/      # 图片资源
-│   │   │   └── index.html   # 主页面
-│   │   ├── java/            # Android Java 代码
-│   │   │   ├── service/     # 后台服务
-│   │   │   ├── utils/       # 工具类
-│   │   │   └── MainActivity.java
-│   │   └── res/             # Android 资源
-│   └── build.gradle         # 模块构建配置
-├── build.gradle             # 项目构建配置
+│   │   ├── java/com/ljbyd/launcher3/   # 原生 Java 代码
+│   │   │   ├── MainActivity.java       # 主界面（桌面全部逻辑）
+│   │   │   ├── bridge/                 # 原 WebViewBridge 迁移（数据库/ADB/接口）
+│   │   │   ├── database/               # SQLite 帮助类
+│   │   │   ├── service/                # 后台服务
+│   │   │   ├── utils/                  # 工具类（App/壁纸/任务等）
+│   │   │   └── adb/                    # ADB Intent 转发（车机控制）
+│   │   ├── res/                        # Android 资源（布局/图片/样式）
+│   │   └── assets_backup/              # 原版 Web 前端资源备份（仅存档，不参与运行）
+│   └── build.gradle                    # 模块构建配置
+├── build.gradle                        # 项目构建配置
 └── README.md
 ```
 
-## 核心功能说明
+## 与原版（WebView 版）的关系
 
-### 音乐控制
-- 通过 MediaSession API 获取播放信息
-- 支持播放/暂停/上一首/下一首控制
-- 实时显示播放进度
-- 黑胶唱片动画效果
-
-### WebView 通信
-- Android 与 JavaScript 双向通信
-- 通过 WebViewBridge 实现数据交换
-- 支持 ADB 命令执行
-
-## 贡献指南
-
-- 欢迎提交 Issue 和 Pull Request！
-- 目前车载控制功能没有实现，希望大佬指导贡献者参与，感激不尽。
-
-1. Fork 本仓库
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+- **界面**：按原版 HTML/CSS 布局 1:1 还原（配色、字号、间距、组件位置一致）
+- **业务逻辑**：原 WebViewBridge 的 170+ JS 接口中与 UI 相关的逻辑已迁移为原生实现：
+  - 时间/农历 → 原生定时器更新
+  - 空调状态 → 原生 JSON 状态更新
+  - 壁纸轮播/手势 → 原生 Handler + GestureDetector
+  - 音乐状态 → MediaSession 广播 → 原生 View 更新
+  - 应用列表 → 原生 ListView（拼音索引、搜索过滤）
+  - 组件显隐 → SQLite 配置（默认全启用）
+- **还原度**：约 88%，已补齐 6 项缺口（蓝牙/WiFi 图标、壁纸滑动/双击/长按手势、快速应用添加/移除、地图应用选择）
+- **数据存储**：沿用原版 SQLite 表结构
 
 ## 开源协议
 
-本项目采用 [MIT](LICENSE) 协议开源。
-
-## 致谢
-
-感谢所有为这个项目做出贡献的开发者。
+本项目采用 [MIT](LICENSE) 协议开源，代码仅供学习交流。
 
 ## 联系方式
 
