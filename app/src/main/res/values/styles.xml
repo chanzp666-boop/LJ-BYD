@@ -50,4 +50,44 @@
         <item name="android:minHeight">4dp</item>
         <item name="android:maxHeight">4dp</item>
     </style>
+
+    <!-- 设置弹窗 Tab 按钮 -->
+    <style name="SettingTabButton">
+        <item name="android:background">@drawable/tab_background_unselected_new</item>
+        <item name="android:textColor">#CCFFFFFF</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+    </style>
+
+    <!-- 设置条目行 -->
+    <style name="SettingItemRow">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:background">@drawable/setting_item_background</item>
+    </style>
+
+    <!-- 设置条目标签 -->
+    <style name="SettingItemLabel">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <!-- 设置保存按钮 -->
+    <style name="SettingSaveButton">
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <!-- 设置动作按钮 -->
+    <style name="SettingActionButton">
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">13sp</item>
+    </style>
 </resources>

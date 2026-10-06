@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 快速启动应用项（对应原前端 quick-app-item） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/quick_app_icon"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/quick_app_icon_desc" />
+
+    <TextView
+        android:id="@+id/quick_app_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textSize="10sp"
+        android:textColor="#FFFFFF"
+        android:singleLine="true"
+        android:maxWidth="44dp"
+        android:ellipsize="end" />
+</LinearLayout>

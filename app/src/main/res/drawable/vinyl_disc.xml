@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 黑胶唱片主体：深色圆盘 + 同心圆纹理 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#121212" />
+            <size android:width="60dp" android:height="60dp" />
+        </shape>
+    </item>
+    <item
+        android:left="6dp"
+        android:top="6dp"
+        android:right="6dp"
+        android:bottom="6dp">
+        <shape android:shape="oval">
+            <stroke android:width="1dp" android:color="#2A2A2A" />
+            <solid android:color="#181818" />
+        </shape>
+    </item>
+    <item
+        android:left="12dp"
+        android:top="12dp"
+        android:right="12dp"
+        android:bottom="12dp">
+        <shape android:shape="oval">
+            <stroke android:width="1dp" android:color="#222222" />
+            <solid android:color="#1A1A1A" />
+        </shape>
+    </item>
+    <item
+        android:left="20dp"
+        android:top="20dp"
+        android:right="20dp"
+        android:bottom="20dp">
+        <shape android:shape="oval">
+            <stroke android:width="1dp" android:color="#2A2A2A" />
+            <solid android:color="#151515" />
+        </shape>
+    </item>
+</layer-list>

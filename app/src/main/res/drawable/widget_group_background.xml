@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 卡片组件半透明白色圆角背景（对应原 CSS .widget-group rgba(255,255,255,0.29)） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#4AFFFFFF" />
+    <corners android:radius="14dp" />
+</shape>

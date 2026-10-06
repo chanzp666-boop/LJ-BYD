@@ -26,20 +26,20 @@ android {
     compileSdk 30
     buildToolsVersion "30.0.2"
     defaultConfig {
-        applicationId "com.dipartner.desktop"
-        minSdk 25
+        applicationId "com.ljbyd.launcher3"
+        minSdk 29
         targetSdk 30
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         release {
-            storeFile file('dipartner.jks')
-            storePassword 'dipartner123'
-            keyAlias 'dipartner'
-            keyPassword 'dipartner123'
+            storeFile file('ljbyd.jks')
+            storePassword 'ljbyd123'
+            keyAlias 'ljbyd'
+            keyPassword 'ljbyd123'
         }
     }
 

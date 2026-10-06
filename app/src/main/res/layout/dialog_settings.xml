@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 设置弹窗（对应原 index.html #settingsModal：壁纸设置/组件配置/系统管理 三个 Tab） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="520dp"
+    android:layout_height="600dp"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_background_rounded">
+
+    <!-- 弹窗标题栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/settings_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF" />
+
+        <ImageView
+            android:id="@+id/closeSettings"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_close"
+            android:padding="6dp"
+            android:contentDescription="@string/close_desc" />
+    </LinearLayout>
+
+    <!-- TAB 导航 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+        <Button
+            android:id="@+id/tabWallpaper"
+            style="@style/SettingTabButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="@string/tab_wallpaper"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/tabComponents"
+            style="@style/SettingTabButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="8dp"
+            android:text="@string/tab_components"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/tabApps"
+            style="@style/SettingTabButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="8dp"
+            android:text="@string/tab_system"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#33FFFFFF" />
+
+    <!-- 弹窗主体（滚动） -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- ========== 壁纸设置 Tab ========== -->
+            <LinearLayout
+                android:id="@+id/wallpaperTabContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/setting_wallpaper_carousel" />
+
+                    <Switch
+                        android:id="@+id/wallpaperCarouselCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/setting_random_mode" />
+
+                    <Switch
+                        android:id="@+id/randomModeCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/setting_specified_mode" />
+
+                    <Switch
+                        android:id="@+id/specifiedModeCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- 壁纸分类开关（16 类） -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/setting_categories"
+                    android:textSize="14sp"
+                    android:textColor="#FFFFFF" />
+
+                <LinearLayout
+                    android:id="@+id/categoryContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/setting_switch_interval" />
+
+                    <EditText
+                        android:id="@+id/switchIntervalInput"
+                        android:layout_width="90dp"
+                        android:layout_height="36dp"
+                        android:inputType="number"
+                        android:background="@drawable/edit_text_background"
+                        android:paddingLeft="10dp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:text="15" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/saveWallpaperSettingsBtn"
+                    style="@style/SettingSaveButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/save" />
+            </LinearLayout>
+
+            <!-- ========== 组件配置 Tab ========== -->
+            <LinearLayout
+                android:id="@+id/componentsTabContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/component_music" />
+
+                    <Switch
+                        android:id="@+id/musicComponentCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/component_map" />
+
+                    <Switch
+                        android:id="@+id/mapComponentCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/component_apps" />
+
+                    <Switch
+                        android:id="@+id/appComponentCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/component_tire_pressure" />
+
+                    <Switch
+                        android:id="@+id/tirePressureComponentCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/component_weather" />
+
+                    <Switch
+                        android:id="@+id/weatherComponentCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/saveComponentsBtn"
+                    style="@style/SettingSaveButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/save" />
+            </LinearLayout>
+
+            <!-- ========== 系统管理 Tab ========== -->
+            <LinearLayout
+                android:id="@+id/appsTabContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/setting_byd_auto_start" />
+
+                    <Switch
+                        android:id="@+id/bydAutoStartCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/setting_boot_greeting" />
+
+                    <Switch
+                        android:id="@+id/bootGreetingCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/setting_app_control" />
+
+                    <Button
+                        android:id="@+id/restartAppBtn"
+                        style="@style/SettingActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:text="@string/restart_app" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/setting_app_settings" />
+
+                    <Button
+                        android:id="@+id/setDefaultDesktopBtn"
+                        style="@style/SettingActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:text="@string/default_desktop" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="@string/setting_authorization" />
+
+                    <Button
+                        android:id="@+id/adbAuthorizationBtn"
+                        style="@style/SettingActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:text="@string/apply_adb" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

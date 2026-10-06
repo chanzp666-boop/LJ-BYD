@@ -1,4 +1,69 @@
 <resources>
-    <string name="app_name">迪伙伴</string>
+    <string name="app_name">垃圾比亚迪</string>
     <string name="accessibility_service_description">用于打开多任务页面的辅助功能服务</string>
+
+    <!-- 界面描述 -->
+    <string name="background_desc">桌面背景</string>
+    <string name="wallpaper_preview_desc">壁纸预览</string>
+    <string name="bluetooth_desc">蓝牙状态</string>
+    <string name="wifi_desc">网络状态</string>
+    <string name="map_desc">地图</string>
+    <string name="go_home">回家</string>
+    <string name="go_company">公司</string>
+    <string name="go_home_desc">回家</string>
+    <string name="go_company_desc">公司</string>
+    <string name="vinyl_desc">黑胶唱片</string>
+    <string name="music_idle_text">此刻无声，佳音已备候君启...</string>
+    <string name="prev_desc">上一首</string>
+    <string name="play_pause_desc">播放/暂停</string>
+    <string name="next_desc">下一首</string>
+    <string name="car_desc">车辆</string>
+    <string name="weather_desc">天气</string>
+    <string name="weather_loading">加载中…</string>
+    <string name="apps_desc">应用列表</string>
+    <string name="tasks_desc">多任务</string>
+    <string name="ac_desc">空调开关</string>
+    <string name="ac_minus_desc">温度减</string>
+    <string name="ac_plus_desc">温度加</string>
+    <string name="ac_wind_dir_desc">风向</string>
+    <string name="ac_wind_dir_desc2">风向</string>
+    <string name="wind_desc">风量背景</string>
+    <string name="wind_level_desc">风量</string>
+    <string name="ac_wind_minus_desc">风量减</string>
+    <string name="ac_wind_plus_desc">风量加</string>
+    <string name="ac_hcs_desc">健康座舱</string>
+    <string name="byd_desc">BYD主页</string>
+    <string name="settings_desc">设置</string>
+
+    <!-- 设置弹窗 -->
+    <string name="settings_title">设置</string>
+    <string name="close_desc">关闭</string>
+    <string name="tab_wallpaper">壁纸设置</string>
+    <string name="tab_components">组件配置</string>
+    <string name="tab_system">系统管理</string>
+    <string name="setting_wallpaper_carousel">壁纸轮播</string>
+    <string name="setting_random_mode">本地随机</string>
+    <string name="setting_specified_mode">本地指定</string>
+    <string name="setting_categories">在线壁纸分类</string>
+    <string name="setting_switch_interval">轮播间隔(秒)</string>
+    <string name="save">保存</string>
+    <string name="component_music">音乐组件</string>
+    <string name="component_map">地图组件</string>
+    <string name="component_apps">APP组件</string>
+    <string name="component_tire_pressure">胎压组件</string>
+    <string name="component_weather">天气组件</string>
+    <string name="setting_byd_auto_start">桌面自启</string>
+    <string name="setting_boot_greeting">开机问候</string>
+    <string name="setting_app_control">应用控制</string>
+    <string name="restart_app">重启应用</string>
+    <string name="setting_app_settings">应用设置</string>
+    <string name="default_desktop">默认桌面</string>
+    <string name="setting_authorization">授权管理</string>
+    <string name="apply_adb">申请ADB</string>
+
+    <!-- 应用列表弹窗 -->
+    <string name="apps_title">应用列表</string>
+    <string name="search_apps">搜索应用…</string>
+    <string name="quick_app_icon_desc">快捷应用图标</string>
+    <string name="app_icon_desc">应用图标</string>
 </resources>

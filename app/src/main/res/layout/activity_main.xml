@@ -1,8 +1,665 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 迪伙伴车载桌面 - 原生主界面（1:1 还原原 WebView 版 index.html） -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.dipartner.desktop.MainActivity">
+    android:background="@android:color/black"
+    tools:context="com.ljbyd.launcher3.MainActivity">
 
+    <!-- 主背景容器 -->
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:contentDescription="@string/background_desc" />
 
-</RelativeLayout>
+    <!-- 壁纸预览层（与背景同层，用于壁纸切换预览） -->
+    <ImageView
+        android:id="@+id/wallpaperPreview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        android:contentDescription="@string/wallpaper_preview_desc" />
+
+    <!-- 顶部状态栏 -->
+    <LinearLayout
+        android:id="@+id/topStatusBar"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="top"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:background="@android:color/transparent">
+
+        <!-- 左侧时间显示 -->
+        <TextView
+            android:id="@+id/topLeftTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:textColor="#FFFFFF"
+            android:text="" />
+
+        <!-- 右侧信息 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/bluetoothIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/lanya"
+                android:contentDescription="@string/bluetooth_desc" />
+
+            <ImageView
+                android:id="@+id/wifiIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="15dp"
+                android:src="@drawable/wifi"
+                android:contentDescription="@string/wifi_desc" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 左侧布局：时间/日期/农历 -->
+    <LinearLayout
+        android:id="@+id/layoutLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginLeft="50dp"
+        android:layout_marginTop="60dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/timeDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:textSize="58sp"
+            android:textColor="#FFFFFF"
+            android:lineSpacingExtra="0dp"
+            android:text="23:59:59"
+            android:shadowColor="#66000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3" />
+
+        <TextView
+            android:id="@+id/dateDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="21sp"
+            android:textColor="#FFFFFF"
+            android:text="2001年04月21日 星期四"
+            android:shadowColor="#66000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3" />
+
+        <TextView
+            android:id="@+id/lunarDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:shadowColor="#66000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="3" />
+    </LinearLayout>
+
+    <!-- 底部卡片区（横向滚动） -->
+    <HorizontalScrollView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginBottom="100dp"
+        android:scrollbars="none"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:id="@+id/widgetsContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <!-- ============ 地图组件 ============ -->
+            <LinearLayout
+                android:id="@+id/mapWidget"
+                android:layout_width="250dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/widget_group_background">
+
+                <ImageView
+                    android:id="@+id/mapIcon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/nav_map"
+                    android:contentDescription="@string/map_desc" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:id="@+id/goHomeBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingLeft="14dp"
+                        android:paddingRight="14dp"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/nav_map_go_home"
+                            android:contentDescription="@string/go_home_desc" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/go_home"
+                            android:textSize="12sp"
+                            android:textColor="#FFFFFF" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/goCompanyBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:paddingLeft="14dp"
+                        android:paddingRight="14dp"
+                        android:background="?attr/selectableItemBackground">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/nav_map_go_company"
+                            android:contentDescription="@string/go_company_desc" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/go_company"
+                            android:textSize="12sp"
+                            android:textColor="#FFFFFF" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============ 音乐组件 ============ -->
+            <LinearLayout
+                android:id="@+id/musicWidget"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:background="@drawable/widget_group_background">
+
+                <!-- 左侧黑胶唱片 -->
+                <FrameLayout
+                    android:id="@+id/vinylRecordContainer"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_marginRight="15dp">
+
+                    <!-- 黑胶唱片主体（旋转） -->
+                    <ImageView
+                        android:id="@+id/vinylRecord"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/vinyl_disc"
+                        android:contentDescription="@string/vinyl_desc" />
+
+                    <!-- 唱片中心 -->
+                    <View
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/vinyl_center" />
+
+                    <!-- 唱针 -->
+                    <View
+                        android:id="@+id/tonearm"
+                        android:layout_width="4dp"
+                        android:layout_height="35dp"
+                        android:layout_gravity="top|end"
+                        android:layout_marginTop="-5dp"
+                        android:layout_marginRight="8dp"
+                        android:background="@drawable/tonearm_bar" />
+                </FrameLayout>
+
+                <!-- 右侧控制区 -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- 歌曲名称 -->
+                    <TextView
+                        android:id="@+id/currentSongName"
+                        android:layout_width="180dp"
+                        android:layout_height="wrap_content"
+                        android:text="@string/music_idle_text"
+                        android:textSize="12sp"
+                        android:textColor="#FFFFFF"
+                        android:singleLine="true"
+                        android:ellipsize="end" />
+
+                    <!-- 播放进度条 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/musicCurrentTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            android:textSize="10sp"
+                            android:textColor="#FFFFFF"
+                            android:layout_marginRight="6dp" />
+
+                        <ProgressBar
+                            android:id="@+id/musicProgressBar"
+                            style="@style/CustomProgressBar"
+                            android:layout_width="90dp"
+                            android:layout_height="4dp"
+                            android:max="100"
+                            android:progress="0" />
+
+                        <TextView
+                            android:id="@+id/musicTotalTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            android:textSize="10sp"
+                            android:textColor="#FFFFFF"
+                            android:layout_marginLeft="6dp" />
+                    </LinearLayout>
+
+                    <!-- 控制按钮组 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <ImageButton
+                            android:id="@+id/prevBtn"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:src="@drawable/nav_music_next0"
+                            android:background="@android:color/transparent"
+                            android:contentDescription="@string/prev_desc" />
+
+                        <ImageButton
+                            android:id="@+id/playPauseBtn"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:src="@drawable/nav_music_play"
+                            android:background="@android:color/transparent"
+                            android:contentDescription="@string/play_pause_desc" />
+
+                        <ImageButton
+                            android:id="@+id/nextBtn"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:src="@drawable/nav_music_next1"
+                            android:background="@android:color/transparent"
+                            android:contentDescription="@string/next_desc" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============ 快速启动 App 组件 ============ -->
+            <LinearLayout
+                android:id="@+id/quickAppsWidget"
+                android:layout_width="240dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:background="@drawable/widget_group_background">
+
+                <GridView
+                    android:id="@+id/quickAppsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:numColumns="4"
+                    android:horizontalSpacing="8dp"
+                    android:verticalSpacing="8dp"
+                    android:listSelector="@android:color/transparent"
+                    android:stretchMode="columnWidth" />
+            </LinearLayout>
+
+            <!-- ============ 胎压组件 ============ -->
+            <LinearLayout
+                android:id="@+id/carWidget"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/widget_group_background">
+
+                <ImageView
+                    android:id="@+id/carImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/nav_car"
+                    android:contentDescription="@string/car_desc" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tireFrontLeft"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="240kPa"
+                        android:textSize="10sp"
+                        android:textColor="#FFFFFF"
+                        android:gravity="start" />
+
+                    <TextView
+                        android:id="@+id/tireFrontRight"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="240kPa"
+                        android:textSize="10sp"
+                        android:textColor="#FFFFFF"
+                        android:gravity="end" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tireRearLeft"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="240kPa"
+                        android:textSize="10sp"
+                        android:textColor="#FFFFFF"
+                        android:gravity="start" />
+
+                    <TextView
+                        android:id="@+id/tireRearRight"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="240kPa"
+                        android:textSize="10sp"
+                        android:textColor="#FFFFFF"
+                        android:gravity="end" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============ 天气组件 ============ -->
+            <LinearLayout
+                android:id="@+id/weatherWidget"
+                android:layout_width="180dp"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="10dp"
+                android:background="@drawable/widget_group_background">
+
+                <ImageView
+                    android:id="@+id/weatherIcon"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:src="@drawable/nav_weather"
+                    android:contentDescription="@string/weather_desc" />
+
+                <TextView
+                    android:id="@+id/weatherTemperature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="--°"
+                    android:textSize="18sp"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:id="@+id/weatherCondition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/weather_loading"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- 底部状态栏 -->
+    <LinearLayout
+        android:id="@+id/statusBar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@android:color/transparent">
+
+        <!-- 左侧按钮组 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:paddingLeft="30dp">
+
+            <ImageButton
+                android:id="@+id/appsBtn"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/nav_apps"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/apps_desc" />
+
+            <ImageButton
+                android:id="@+id/tasksBtn"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="20dp"
+                android:src="@drawable/nav_tasks"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/tasks_desc" />
+        </LinearLayout>
+
+        <!-- 中间控制组 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/acControl"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:src="@drawable/nav_air"
+                android:contentDescription="@string/ac_desc" />
+
+            <ImageView
+                android:id="@+id/acMinus"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/nav_minus"
+                android:contentDescription="@string/ac_minus_desc" />
+
+            <TextView
+                android:id="@+id/airTempText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="22°"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF" />
+
+            <ImageView
+                android:id="@+id/acPlus"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="4dp"
+                android:src="@drawable/nav_add"
+                android:contentDescription="@string/ac_plus_desc" />
+
+            <ImageView
+                android:id="@+id/acArrow1"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/nav_arrow1"
+                android:contentDescription="@string/ac_wind_dir_desc" />
+
+            <!-- 风量显示 -->
+            <FrameLayout
+                android:id="@+id/windDisplay"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="4dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/nav_air"
+                    android:contentDescription="@string/wind_desc" />
+
+                <ImageView
+                    android:id="@+id/windLevel"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/wind_level_06"
+                    android:contentDescription="@string/wind_level_desc" />
+            </FrameLayout>
+
+            <ImageView
+                android:id="@+id/acArrow2"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="4dp"
+                android:src="@drawable/nav_arrow2"
+                android:contentDescription="@string/ac_wind_dir_desc2" />
+
+            <ImageView
+                android:id="@+id/acWindMinus"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/nav_minus"
+                android:contentDescription="@string/ac_wind_minus_desc" />
+
+            <TextView
+                android:id="@+id/airWindTempText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="22°"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF" />
+
+            <ImageView
+                android:id="@+id/acWindPlus"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="4dp"
+                android:src="@drawable/nav_add"
+                android:contentDescription="@string/ac_wind_plus_desc" />
+
+            <ImageView
+                android:id="@+id/acHcs"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/nav_ac_hcs"
+                android:contentDescription="@string/ac_hcs_desc" />
+        </LinearLayout>
+
+        <!-- 右侧按钮组 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:paddingRight="30dp">
+
+            <ImageButton
+                android:id="@+id/bydBtn"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/nav_byds"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/byd_desc" />
+
+            <ImageButton
+                android:id="@+id/settingsBtn"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginLeft="20dp"
+                android:src="@drawable/nav_seetings"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/settings_desc" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- 音乐可视化浮层（叠加在音乐组件区域，由代码控制显隐） -->
+    <com.ljbyd.launcher3.ui.MusicVisualizerView
+        android:id="@+id/musicVisualizerView"
+        android:layout_width="120dp"
+        android:layout_height="40dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginLeft="210dp"
+        android:layout_marginBottom="115dp"
+        android:visibility="gone" />
+
+</FrameLayout>
