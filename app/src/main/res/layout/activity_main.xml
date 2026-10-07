@@ -341,6 +341,16 @@
                             android:src="@drawable/nav_music_next1"
                             android:background="@android:color/transparent"
                             android:contentDescription="@string/next_desc" />
+
+                        <Button
+                            android:id="@+id/localMusicBtn"
+                            android:layout_width="wrap_content"
+                            android:layout_height="34dp"
+                            android:layout_marginLeft="10dp"
+                            android:background="@drawable/car_btn_bg"
+                            android:text="本地音乐"
+                            android:textColor="#FF55D6FF"
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

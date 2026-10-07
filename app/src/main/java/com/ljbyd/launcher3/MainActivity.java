@@ -19,6 +19,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -449,9 +450,30 @@ public class MainActivity extends AppCompatActivity {
         goCompanyBtn.setOnClickListener(v -> navigateCompany());
 
         // 音乐控制
-        prevBtn.setOnClickListener(v -> { if (webViewBridge != null) webViewBridge.playPrevious(); });
-        playPauseBtn.setOnClickListener(v -> { if (webViewBridge != null) webViewBridge.playPause(); });
-        nextBtn.setOnClickListener(v -> { if (webViewBridge != null) webViewBridge.playNext(); });
+        prevBtn.setOnClickListener(v -> {
+            if (mLocalMusic != null && mLocalMusic.getCurrentSong() != null) {
+                mLocalMusic.playPrevious();
+                updateLocalMusicPlayIcon();
+            } else if (webViewBridge != null) {
+                webViewBridge.playPrevious();
+            }
+        });
+        playPauseBtn.setOnClickListener(v -> {
+            if (mLocalMusic != null && mLocalMusic.getCurrentSong() != null) {
+                mLocalMusic.playPause();
+                updateLocalMusicPlayIcon();
+            } else if (webViewBridge != null) {
+                webViewBridge.playPause();
+            }
+        });
+        nextBtn.setOnClickListener(v -> {
+            if (mLocalMusic != null && mLocalMusic.getCurrentSong() != null) {
+                mLocalMusic.playNext();
+                updateLocalMusicPlayIcon();
+            } else if (webViewBridge != null) {
+                webViewBridge.playNext();
+            }
+        });
 
         // 快速启动 App 点击
         quickAppsContainer.setOnItemClickListener((parent, view, position, id) -> {
@@ -496,6 +518,114 @@ public class MainActivity extends AppCompatActivity {
         initQuickAppLongPress();
         // 回家/公司长按：选择地图应用
         initMapAppSelection();
+
+        // ==================== 卡片式桌面（仿迪友） ====================
+        // 按配置重排/显隐桌面卡片（设置里可开关、调顺序）
+        com.ljbyd.launcher3.card.DesktopCardManager.apply(widgetsContainer);
+
+        // ==================== 本地音乐 + 悬浮歌词（仿迪友） ====================
+        initLocalMusic();
+        // 应用已保存的扩展设置（夜间模式/主题色/时间格式/触摸音）
+        applyExtSettings();
+        // 开机任务键（仿迪友 KEY_CUSTOM_KEY_BOOT_TASK）
+        runBootTask();
+    }
+
+    // ==================== 本地音乐（仿迪友 LocalMusicItemBean + 悬浮歌词） ====================
+
+    private com.ljbyd.launcher3.music.LocalMusicManager mLocalMusic;
+    private com.ljbyd.launcher3.music.FloatingLyricWindow mLyricWindow;
+    private int mLocalMusicIndex = -1;
+    private boolean mLocalMusicPlaying = false;
+    private final Runnable mLocalMusicTicker = new Runnable() {
+        @Override
+        public void run() {
+            if (mLocalMusic != null) {
+                mLocalMusic.tick();
+            }
+            timeUpdateHandler.postDelayed(this, 200);
+        }
+    };
+
+    private void initLocalMusic() {
+        mLocalMusic = com.ljbyd.launcher3.music.LocalMusicManager.getInstance(this);
+        mLyricWindow = new com.ljbyd.launcher3.music.FloatingLyricWindow(this);
+        mLocalMusic.setListener(new com.ljbyd.launcher3.music.LocalMusicManager.Listener() {
+            @Override
+            public void onSongChanged(com.ljbyd.launcher3.music.LocalMusicManager.Song song, boolean isPlaying) {
+                mLocalMusicPlaying = isPlaying;
+                runOnUiThread(() -> {
+                    if (song != null) {
+                        currentSongName.setText(song.display());
+                        String info = (song.artist == null || song.artist.isEmpty()) ? "" : song.artist;
+                        musicTotalTime.setText(formatMs(song.duration));
+                    }
+                    updateLocalMusicPlayIcon();
+                    if (mLyricWindow != null && mLyricWindow.isVisible()) {
+                        mLyricWindow.updateSong(song == null ? null : song.display(),
+                                song == null ? null : song.artist);
+                    }
+                });
+            }
+
+            @Override
+            public void onProgress(long positionMs, long durationMs) {
+                runOnUiThread(() -> {
+                    musicCurrentTime.setText(formatMs(positionMs));
+                    if (durationMs > 0) {
+                        musicProgressBar.setMax((int) durationMs);
+                        musicProgressBar.setProgress((int) positionMs);
+                    }
+                });
+            }
+
+            @Override
+            public void onLyricLine(String line) {
+                if (mLyricWindow != null) {
+                    mLyricWindow.updateLyric(line);
+                }
+            }
+        });
+
+        findViewById(R.id.localMusicBtn).setOnClickListener(v -> {
+            new Thread(() -> {
+                final java.util.List<com.ljbyd.launcher3.music.LocalMusicManager.Song> songs =
+                        mLocalMusic.scanMusic();
+                runOnUiThread(() -> com.ljbyd.launcher3.music.LocalMusicDialog.show(this,
+                        songs, mLocalMusicIndex, (song, index) -> {
+                            mLocalMusicIndex = index;
+                            mLocalMusic.play(index);
+                            updateLocalMusicPlayIcon();
+                        }));
+            }).start();
+        });
+
+        // 歌词悬浮窗开关：长按"本地音乐"按钮切换
+        findViewById(R.id.localMusicBtn).setOnLongClickListener(v -> {
+            boolean on = !mLyricWindow.isEnabled();
+            mLyricWindow.setEnabled(on);
+            Toast.makeText(this, on ? "悬浮歌词已开启" : "悬浮歌词已关闭", Toast.LENGTH_SHORT).show();
+            return true;
+        });
+
+        // 本地音乐播放进度轮询（ticker）
+        timeUpdateHandler.removeCallbacks(mLocalMusicTicker);
+        timeUpdateHandler.postDelayed(mLocalMusicTicker, 200);
+    }
+
+    private void updateLocalMusicPlayIcon() {
+        // 本地音乐播放中：播放按钮显示暂停图标
+        if (mLocalMusicPlaying) {
+            playPauseBtn.setImageResource(R.drawable.nav_music_pause);
+        } else {
+            playPauseBtn.setImageResource(R.drawable.nav_music_play);
+        }
+    }
+
+    private String formatMs(long ms) {
+        if (ms <= 0) return "00:00";
+        long totalSec = ms / 1000;
+        return String.format(java.util.Locale.CHINA, "%02d:%02d", totalSec / 60, totalSec % 60);
     }
 
     /**
@@ -1220,17 +1350,21 @@ public class MainActivity extends AppCompatActivity {
         Button tabWallpaper = settingsDialog.findViewById(R.id.tabWallpaper);
         Button tabComponents = settingsDialog.findViewById(R.id.tabComponents);
         Button tabApps = settingsDialog.findViewById(R.id.tabApps);
+        Button tabExtend = settingsDialog.findViewById(R.id.tabExtend);
         LinearLayout wallpaperTab = settingsDialog.findViewById(R.id.wallpaperTabContent);
         LinearLayout componentsTab = settingsDialog.findViewById(R.id.componentsTabContent);
         LinearLayout appsTab = settingsDialog.findViewById(R.id.appsTabContent);
+        LinearLayout extendTab = settingsDialog.findViewById(R.id.extendTabContent);
 
         // Tab 切换
-        tabWallpaper.setOnClickListener(v -> switchSettingTab(tabWallpaper, tabComponents, tabApps,
-                wallpaperTab, componentsTab, appsTab));
-        tabComponents.setOnClickListener(v -> switchSettingTab(tabComponents, tabWallpaper, tabApps,
-                componentsTab, wallpaperTab, appsTab));
-        tabApps.setOnClickListener(v -> switchSettingTab(tabApps, tabWallpaper, tabComponents,
-                appsTab, wallpaperTab, componentsTab));
+        tabWallpaper.setOnClickListener(v -> switchSettingTab(tabWallpaper, tabComponents, tabApps, tabExtend,
+                wallpaperTab, componentsTab, appsTab, extendTab));
+        tabComponents.setOnClickListener(v -> switchSettingTab(tabComponents, tabWallpaper, tabApps, tabExtend,
+                componentsTab, wallpaperTab, appsTab, extendTab));
+        tabApps.setOnClickListener(v -> switchSettingTab(tabApps, tabWallpaper, tabComponents, tabExtend,
+                appsTab, wallpaperTab, componentsTab, extendTab));
+        tabExtend.setOnClickListener(v -> switchSettingTab(tabExtend, tabWallpaper, tabComponents, tabApps,
+                extendTab, wallpaperTab, componentsTab, appsTab));
 
         // 壁纸设置控件
         Switch wallpaperCarouselCheckbox = settingsDialog.findViewById(R.id.wallpaperCarouselCheckbox);
@@ -1300,8 +1434,12 @@ public class MainActivity extends AppCompatActivity {
             componentConfigDbHelper.saveOrUpdateComponentConfig("tirePressure", tirePressureComponentCheckbox.isChecked());
             componentConfigDbHelper.saveOrUpdateComponentConfig("weather", weatherComponentCheckbox.isChecked());
             applyComponentVisibility();
+            com.ljbyd.launcher3.card.DesktopCardManager.apply(widgetsContainer);
             Toast.makeText(this, "组件配置已保存", Toast.LENGTH_SHORT).show();
         });
+
+        // 卡片排序（仿迪友：桌面卡片位置可交换）
+        buildCardOrderUi(settingsDialog);
 
         // 系统管理
         bydAutoStartCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -1320,20 +1458,300 @@ public class MainActivity extends AppCompatActivity {
             if (webViewBridge != null) webViewBridge.triggerWirelessAdbAuthorization();
         });
 
+        // ============ 扩展设置（仿迪友设置项） ============
+        bindExtendSettings(settingsDialog);
+
         settingsDialog.show();
+    }
+
+    // ==================== 扩展设置（仿迪友：时间/UI模式/红绿灯/音效/主题/双画中画） ====================
+
+    private static final String EXT_PREFS = "ljbyd_ext";
+    public static final String EXT_TIME_24H = "time_24h";
+    public static final String EXT_NIGHT_MODE = "night_mode";
+    public static final String EXT_TRAFFIC_LIGHT = "traffic_light";
+    public static final String EXT_TOUCH_SOUND = "touch_sound";
+    public static final String EXT_THEME_COLOR = "theme_color";
+    public static final String EXT_DUAL_PIP = "dual_pip";
+
+    private SharedPreferences extPrefs() {
+        return getSharedPreferences(EXT_PREFS, MODE_PRIVATE);
+    }
+
+    /** 应用扩展设置到界面（时间格式/夜间模式/主题色等） */
+    private void applyExtSettings() {
+        SharedPreferences sp = extPrefs();
+        boolean night = sp.getBoolean(EXT_NIGHT_MODE, false);
+        if (night) {
+            // 夜间模式：桌面暗化（背景压暗）
+            View bg = findViewById(R.id.backgroundImage);
+            if (bg != null) bg.setAlpha(0.55f);
+        } else {
+            View bg = findViewById(R.id.backgroundImage);
+            if (bg != null) bg.setAlpha(1f);
+        }
+        // 主题色：更新控制栏高亮文字颜色
+        applyThemeColor(sp.getString(EXT_THEME_COLOR, "blue"));
+        // 触摸音
+        boolean touch = sp.getBoolean(EXT_TOUCH_SOUND, true);
+        try {
+            android.provider.Settings.System.putInt(getContentResolver(),
+                    android.provider.Settings.System.SOUND_EFFECTS_ENABLED, touch ? 1 : 0);
+        } catch (Exception ignored) {
+        }
+        // 双画中画模式（PipWindowManager 显示 ＋画中画 入口）
+        try {
+            com.ljbyd.launcher3.PipWindowManager.getInstance(this)
+                    .setDualPipEnabled(sp.getBoolean(EXT_DUAL_PIP, false));
+        } catch (Exception e) {
+            Log.e("MainActivity", "设置双画中画模式失败", e);
+        }
+    }
+
+    private void applyThemeColor(String color) {
+        int accent = 0xFF55D6FF;
+        if ("green".equals(color)) accent = 0xFF55FF9E;
+        else if ("purple".equals(color)) accent = 0xFFC77DFF;
+        try {
+            TextView carInfo = findViewById(R.id.airWindTempText);
+            if (carInfo != null) carInfo.setTextColor(accent);
+        } catch (Exception ignored) {
+        }
+        mThemeAccent = accent;
+    }
+
+    private int mThemeAccent = 0xFF55D6FF;
+
+    private void bindExtendSettings(Dialog dialog) {
+        SharedPreferences sp = extPrefs();
+
+        android.widget.Switch timeFormat = dialog.findViewById(R.id.timeFormatCheckbox);
+        android.widget.Switch nightMode = dialog.findViewById(R.id.nightModeCheckbox);
+        android.widget.Switch trafficLight = dialog.findViewById(R.id.trafficLightCheckbox);
+        android.widget.Switch touchSound = dialog.findViewById(R.id.touchSoundCheckbox);
+        android.widget.Switch lyricWindow = dialog.findViewById(R.id.lyricWindowCheckbox);
+        android.widget.Switch dualPip = dialog.findViewById(R.id.dualPipCheckbox);
+        Button themeBlue = dialog.findViewById(R.id.themeBlueBtn);
+        Button themeGreen = dialog.findViewById(R.id.themeGreenBtn);
+        Button themePurple = dialog.findViewById(R.id.themePurpleBtn);
+        Button saveExtend = dialog.findViewById(R.id.saveExtendBtn);
+
+        timeFormat.setChecked(sp.getBoolean(EXT_TIME_24H, true));
+        nightMode.setChecked(sp.getBoolean(EXT_NIGHT_MODE, false));
+        trafficLight.setChecked(sp.getBoolean(EXT_TRAFFIC_LIGHT, false));
+        touchSound.setChecked(sp.getBoolean(EXT_TOUCH_SOUND, true));
+        lyricWindow.setChecked(mLyricWindow != null && mLyricWindow.isEnabled());
+        dualPip.setChecked(sp.getBoolean(EXT_DUAL_PIP, false));
+
+        final String[] themeColor = {sp.getString(EXT_THEME_COLOR, "blue")};
+        themeBlue.setOnClickListener(v -> themeColor[0] = "blue");
+        themeGreen.setOnClickListener(v -> themeColor[0] = "green");
+        themePurple.setOnClickListener(v -> themeColor[0] = "purple");
+
+        saveExtend.setOnClickListener(v -> {
+            sp.edit()
+                    .putBoolean(EXT_TIME_24H, timeFormat.isChecked())
+                    .putBoolean(EXT_NIGHT_MODE, nightMode.isChecked())
+                    .putBoolean(EXT_TRAFFIC_LIGHT, trafficLight.isChecked())
+                    .putBoolean(EXT_TOUCH_SOUND, touchSound.isChecked())
+                    .putString(EXT_THEME_COLOR, themeColor[0])
+                    .putBoolean(EXT_DUAL_PIP, dualPip.isChecked())
+                    .apply();
+            if (mLyricWindow != null) {
+                mLyricWindow.setEnabled(lyricWindow.isChecked());
+            }
+            applyExtSettings();
+            Toast.makeText(this, "扩展设置已保存", Toast.LENGTH_SHORT).show();
+        });
+
+        // ============ 自定义方向盘按键（仿迪友 CustomKeyBean） ============
+        bindCustomKeyButton(dialog, R.id.keyVoiceBtn, com.ljbyd.launcher3.customkey.CustomKeyManager.SLOT_VOICE);
+        bindCustomKeyButton(dialog, R.id.keyLeftBtn, com.ljbyd.launcher3.customkey.CustomKeyManager.SLOT_LEFT);
+        bindCustomKeyButton(dialog, R.id.keyRightBtn, com.ljbyd.launcher3.customkey.CustomKeyManager.SLOT_RIGHT);
+        bindCustomKeyButton(dialog, R.id.keyBootBtn, com.ljbyd.launcher3.customkey.CustomKeyManager.SLOT_BOOT);
+    }
+
+    /** 自定义按键按钮：显示当前映射应用；点击弹应用选择（仿迪友） */
+    private void bindCustomKeyButton(Dialog dialog, int btnId, final String slot) {
+        Button btn = dialog.findViewById(btnId);
+        if (btn == null) return;
+        refreshCustomKeyLabel(btn, slot);
+        btn.setOnClickListener(v -> {
+            List<Map<String, Object>> data = new java.util.ArrayList<>();
+            List<android.content.pm.ResolveInfo> apps = queryLaunchableApps();
+            android.content.pm.PackageManager pm = getPackageManager();
+            for (android.content.pm.ResolveInfo info : apps) {
+                Map<String, Object> row = new java.util.HashMap<>();
+                row.put("icon", info.activityInfo.loadIcon(pm));
+                row.put("name", info.loadLabel(pm).toString());
+                row.put("pkg", info.activityInfo.packageName);
+                data.add(row);
+            }
+            final int[] selected = {0};
+            android.widget.SimpleAdapter adapter = new android.widget.SimpleAdapter(
+                    this, data, R.layout.item_pip_app_picker,
+                    new String[]{"icon", "name"},
+                    new int[]{R.id.pipPickerIcon, R.id.pipPickerName}) {
+                @Override
+                public android.view.View getView(int position, android.view.View convertView, android.view.ViewGroup parent) {
+                    android.view.View v = super.getView(position, convertView, parent);
+                    android.widget.ImageView check = v.findViewById(R.id.pipPickerCheck);
+                    boolean isSel = position == selected[0];
+                    check.setVisibility(isSel ? android.view.View.VISIBLE : android.view.View.INVISIBLE);
+                    check.setImageResource(isSel ? R.drawable.ic_check_circle : 0);
+                    return v;
+                }
+            };
+            android.widget.ListView listView = new android.widget.ListView(this);
+            listView.setAdapter(adapter);
+            listView.setDividerHeight(1);
+            listView.setOnItemClickListener((parent, view, position, id) -> {
+                selected[0] = position;
+                adapter.notifyDataSetChanged();
+            });
+            new android.app.AlertDialog.Builder(this)
+                    .setTitle("选择按键打开的软件（" + com.ljbyd.launcher3.customkey.CustomKeyManager.slotName(this, slot) + "）")
+                    .setView(listView)
+                    .setPositiveButton("确定", (d, w) -> {
+                        String pkg = (String) data.get(selected[0]).get("pkg");
+                        com.ljbyd.launcher3.customkey.CustomKeyManager.set(this, slot, pkg);
+                        refreshCustomKeyLabel(btn, slot);
+                    })
+                    .setNegativeButton("清除", (d, w) -> {
+                        com.ljbyd.launcher3.customkey.CustomKeyManager.set(this, slot, null);
+                        refreshCustomKeyLabel(btn, slot);
+                    })
+                    .setNeutralButton("取消", null)
+                    .show();
+        });
+    }
+
+    private void refreshCustomKeyLabel(Button btn, String slot) {
+        String pkg = com.ljbyd.launcher3.customkey.CustomKeyManager.get(this, slot);
+        if (pkg == null) {
+            btn.setText("未设置");
+        } else {
+            try {
+                android.content.pm.ApplicationInfo ai = getPackageManager()
+                        .getApplicationInfo(pkg, 0);
+                btn.setText(getPackageManager().getApplicationLabel(ai).toString());
+            } catch (Exception e) {
+                btn.setText(pkg);
+            }
+        }
+    }
+
+    /** 查本机可启动应用（自定义按键/画中画共用） */
+    private List<android.content.pm.ResolveInfo> queryLaunchableApps() {
+        Intent mainIntent = new Intent(Intent.ACTION_MAIN);
+        mainIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+        return getPackageManager().queryIntentActivities(mainIntent, 0);
+    }
+
+    /** 物理按键 → 自定义映射（方向盘语音/左/右键） */
+    @Override
+    public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
+        try {
+            String pkg = com.ljbyd.launcher3.customkey.CustomKeyManager.getByKeyCode(this, keyCode);
+            if (pkg != null) {
+                Intent intent = getPackageManager().getLaunchIntentForPackage(pkg);
+                if (intent != null) {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            Log.e("MainActivity", "自定义按键处理失败", e);
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    /** 开机任务：启动时打开指定应用（仿迪友 KEY_CUSTOM_KEY_BOOT_TASK） */
+    private void runBootTask() {
+        try {
+            String pkg = com.ljbyd.launcher3.customkey.CustomKeyManager.get(this,
+                    com.ljbyd.launcher3.customkey.CustomKeyManager.SLOT_BOOT);
+            if (pkg != null) {
+                Intent intent = getPackageManager().getLaunchIntentForPackage(pkg);
+                if (intent != null) {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    Log.i("MainActivity", "开机任务启动: " + pkg);
+                }
+            }
+        } catch (Exception e) {
+            Log.e("MainActivity", "开机任务执行失败", e);
+        }
     }
 
     /**
      * 设置弹窗 Tab 切换
      */
-    private void switchSettingTab(Button activeTab, Button tab2, Button tab3,
-                                  LinearLayout activeContent, LinearLayout content2, LinearLayout content3) {
+    private void switchSettingTab(Button activeTab, Button tab2, Button tab3, Button tab4,
+                                  LinearLayout activeContent, LinearLayout content2,
+                                  LinearLayout content3, LinearLayout content4) {
         activeTab.setBackgroundResource(R.drawable.tab_background_selected_new);
         tab2.setBackgroundResource(R.drawable.tab_background_unselected_new);
         tab3.setBackgroundResource(R.drawable.tab_background_unselected_new);
+        if (tab4 != null) {
+            tab4.setBackgroundResource(R.drawable.tab_background_unselected_new);
+        }
         activeContent.setVisibility(View.VISIBLE);
         content2.setVisibility(View.GONE);
         content3.setVisibility(View.GONE);
+        if (content4 != null) {
+            content4.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 设置弹窗里渲染卡片排序 UI（仿迪友卡片式桌面）
+     */
+    private void buildCardOrderUi(Dialog dialog) {
+        try {
+            LinearLayout container = dialog.findViewById(R.id.cardOrderContainer);
+            if (container == null) return;
+            container.removeAllViews();
+            java.util.List<String> order = com.ljbyd.launcher3.card.DesktopCardManager.getOrder(this);
+            for (int i = 0; i < order.size(); i++) {
+                final String key = order.get(i);
+                final int pos = i;
+                android.widget.LinearLayout row = new android.widget.LinearLayout(this);
+                row.setOrientation(android.widget.LinearLayout.HORIZONTAL);
+                row.setGravity(android.view.Gravity.CENTER_VERTICAL);
+                android.widget.TextView label = new android.widget.TextView(this);
+                label.setText((pos + 1) + ". " + com.ljbyd.launcher3.card.DesktopCardManager.cardName(this, key));
+                label.setTextColor(0xFFFFFFFF);
+                label.setTextSize(14);
+                label.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                        0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1));
+                row.addView(label);
+                android.widget.Button upBtn = new android.widget.Button(this);
+                upBtn.setText("↑");
+                upBtn.setTextSize(16);
+                upBtn.setOnClickListener(v -> {
+                    com.ljbyd.launcher3.card.DesktopCardManager.moveCard(this, key, -1);
+                    rebuildCardOrderUi(dialog);
+                });
+                row.addView(upBtn);
+                android.widget.Button downBtn = new android.widget.Button(this);
+                downBtn.setText("↓");
+                downBtn.setTextSize(16);
+                downBtn.setOnClickListener(v -> {
+                    com.ljbyd.launcher3.card.DesktopCardManager.moveCard(this, key, 1);
+                    rebuildCardOrderUi(dialog);
+                });
+                row.addView(downBtn);
+                container.addView(row);
+            }
+        } catch (Exception e) {
+            Log.e("MainActivity", "卡片排序UI构建失败", e);
+        }
+    }
+
+    private void rebuildCardOrderUi(Dialog dialog) {
+        buildCardOrderUi(dialog);
     }
 
     /**
@@ -1861,6 +2279,12 @@ public class MainActivity extends AppCompatActivity {
             createDirectoriesInRoot();
             return;
         }
+        // 用户已拒绝过则不再反复弹窗（避免每次启动打扰）
+        SharedPreferences sp = getSharedPreferences("ljbyd_storage_prompt", MODE_PRIVATE);
+        if (sp.getBoolean("dismissed", false)) {
+            createDirectoriesInRoot();
+            return;
+        }
 
         runOnUiThread(() -> new AlertDialog.Builder(MainActivity.this)
                 .setTitle("存储权限必要")
@@ -1885,6 +2309,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .setNegativeButton("取消", (dialog, which) -> {
+                    sp.edit().putBoolean("dismissed", true).apply();
                     dialog.dismiss();
                     Toast.makeText(MainActivity.this, "未获得存储权限，部分功能可能无法正常使用", Toast.LENGTH_LONG).show();
                 })

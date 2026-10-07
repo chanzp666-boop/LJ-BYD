@@ -70,6 +70,16 @@
             android:layout_marginLeft="8dp"
             android:text="@string/tab_system"
             android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/tabExtend"
+            style="@style/SettingTabButton"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
+            android:layout_marginLeft="8dp"
+            android:text="扩展"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <View
@@ -271,6 +281,21 @@
                         android:layout_height="wrap_content" />
                 </LinearLayout>
 
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:text="卡片排序（点 ↓ 下移，点 ↑ 上移，重启/保存后生效）"
+                    android:textSize="12sp"
+                    android:textColor="#CCFFFFFF" />
+
+                <!-- 卡片排序容器：运行时动态填充 -->
+                <LinearLayout
+                    android:id="@+id/cardOrderContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
                 <Button
                     android:id="@+id/saveComponentsBtn"
                     style="@style/SettingSaveButton"
@@ -368,6 +393,232 @@
                         android:layout_height="34dp"
                         android:text="@string/apply_adb" />
                 </LinearLayout>
+            </LinearLayout>
+
+            <!-- ========== 扩展设置 Tab（仿迪友设置项） ========== -->
+            <LinearLayout
+                android:id="@+id/extendTabContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="24 小时制" />
+
+                    <Switch
+                        android:id="@+id/timeFormatCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="夜间模式（日间/夜间 UI）" />
+
+                    <Switch
+                        android:id="@+id/nightModeCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="红绿灯信息显示" />
+
+                    <Switch
+                        android:id="@+id/trafficLightCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="触摸音效" />
+
+                    <Switch
+                        android:id="@+id/touchSoundCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="悬浮歌词" />
+
+                    <Switch
+                        android:id="@+id/lyricWindowCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="主题色" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/themeBlueBtn"
+                            style="@style/SettingActionButton"
+                            android:layout_width="52dp"
+                            android:layout_height="34dp"
+                            android:text="蓝"
+                            android:textColor="#55D6FF" />
+
+                        <Button
+                            android:id="@+id/themeGreenBtn"
+                            style="@style/SettingActionButton"
+                            android:layout_width="52dp"
+                            android:layout_height="34dp"
+                            android:layout_marginLeft="6dp"
+                            android:text="绿"
+                            android:textColor="#55FF9E" />
+
+                        <Button
+                            android:id="@+id/themePurpleBtn"
+                            style="@style/SettingActionButton"
+                            android:layout_width="52dp"
+                            android:layout_height="34dp"
+                            android:layout_marginLeft="6dp"
+                            android:text="紫"
+                            android:textColor="#C77DFF" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="双画中画模式" />
+
+                    <Switch
+                        android:id="@+id/dualPipCheckbox"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- 自定义方向盘按键（仿迪友 CustomKeyBean） -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="自定义方向盘按键（单击打开所选软件）"
+                    android:textSize="13sp"
+                    android:textColor="#55D6FF" />
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="语音键" />
+
+                    <Button
+                        android:id="@+id/keyVoiceBtn"
+                        style="@style/SettingActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:text="未设置" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="方向盘左键" />
+
+                    <Button
+                        android:id="@+id/keyLeftBtn"
+                        style="@style/SettingActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:text="未设置" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="方向盘右键" />
+
+                    <Button
+                        android:id="@+id/keyRightBtn"
+                        style="@style/SettingActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:text="未设置" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/SettingItemRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        style="@style/SettingItemLabel"
+                        android:text="开机任务键" />
+
+                    <Button
+                        android:id="@+id/keyBootBtn"
+                        style="@style/SettingActionButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="34dp"
+                        android:text="未设置" />
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/saveExtendBtn"
+                    style="@style/SettingSaveButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/save" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

@@ -242,5 +242,16 @@
                 android:textColor="#FF8FA3B8"
                 android:textSize="12sp" />
         </LinearLayout>
+
+        <!-- 完整车控入口（仿迪友：空调/座椅/天窗/能量/灯光全功能面板） -->
+        <Button
+            android:id="@+id/btnFullControl"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/car_btn_bg"
+            android:text="完整车控 ▾"
+            android:textColor="#FF55D6FF"
+            android:textSize="14sp" />
     </LinearLayout>
 </LinearLayout>

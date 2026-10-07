@@ -66,10 +66,15 @@ public class PipWindowManager {
     private TextView mStatusText;
     private ImageView mSettingsBtn;
     private ImageView mCloseBtn;
+    private TextView mAddWindowBtn;
 
     private MediaProjection mMediaProjection;
     private VirtualDisplay mVirtualDisplay;
     private String mCurrentPackage = null;
+
+    // 二级画中画（仿迪友双画中画）
+    private SecondaryPipWindow mSecondaryWindow;
+    private boolean mDualPipEnabled = false;
 
     /** 左侧 1/4 车辆信息区（与画中画同步显示） */
     private CarInfoPanel mCarInfoPanel;
@@ -152,6 +157,21 @@ public class PipWindowManager {
             Log.i(TAG, "画中画已隐藏");
         } catch (Exception e) {
             Log.e(TAG, "隐藏画中画失败: " + e.getMessage(), e);
+        }
+    }
+
+    /** 车控面板打开时隐藏左车况区，关闭时恢复（避免 z 序重叠） */
+    public void setCarInfoVisible(boolean visible) {
+        try {
+            if (mCarInfoPanel != null) {
+                if (visible) {
+                    if (mVisible) mCarInfoPanel.show();
+                } else {
+                    mCarInfoPanel.hide();
+                }
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "切换车况区显示失败", e);
         }
     }
 
@@ -240,6 +260,18 @@ public class PipWindowManager {
         mSettingsBtn.setOnClickListener(v -> {
             Log.i(TAG, "三点设置按钮被点击");
             showAppPicker();
+        });
+        // ＋画中画（二级窗口入口，双画中画模式开启时显示）
+        TextView addWindowBtn = mRootView.findViewById(R.id.pipAddWindowBtn);
+        mAddWindowBtn = addWindowBtn;
+        addWindowBtn.setOnClickListener(v -> {
+            Log.i(TAG, "二级画中画入口被点击");
+            if (mSecondaryWindow != null && mSecondaryWindow.isVisible()) {
+                // 已在显示：重新选择应用
+                showSecondaryAppPicker();
+            } else {
+                showSecondaryAppPicker();
+            }
         });
         // 关闭按钮
         mCloseBtn.setOnClickListener(v -> {
@@ -402,6 +434,84 @@ public class PipWindowManager {
     }
 
     /**
+     * 设置双画中画模式（true：画中画窗口显示 ＋画中画 入口）
+     */
+    public void setDualPipEnabled(boolean on) {
+        mDualPipEnabled = on;
+        if (mAddWindowBtn != null) {
+            mAddWindowBtn.setVisibility(on ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    public boolean isDualPipEnabled() {
+        return mDualPipEnabled;
+    }
+
+    /** 二级画中画：应用选择弹窗（与主窗 ⋮ 同款） */
+    private void showSecondaryAppPicker() {
+        // 主窗镜像未授权时二级窗不可用
+        if (mMediaProjection == null) {
+            Toast.makeText(mContext, "请先在主画中画完成录屏授权", Toast.LENGTH_LONG).show();
+            return;
+        }
+        if (mSecondaryWindow == null) {
+            mSecondaryWindow = new SecondaryPipWindow(mContext, mMediaProjection);
+        }
+        List<ResolveInfo> apps = queryLaunchableApps();
+        if (apps.isEmpty()) {
+            Toast.makeText(mContext, "未获取到应用列表", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        List<Map<String, Object>> data = new ArrayList<>();
+        PackageManager pm = mContext.getPackageManager();
+        for (ResolveInfo info : apps) {
+            Map<String, Object> row = new HashMap<>();
+            row.put("icon", info.activityInfo.loadIcon(pm));
+            row.put("name", info.loadLabel(pm).toString());
+            row.put("pkg", info.activityInfo.packageName);
+            row.put("checked", Boolean.FALSE);
+            data.add(row);
+        }
+
+        final int[] selected = {0};
+        SimpleAdapter adapter = new SimpleAdapter(
+                mContext, data, R.layout.item_pip_app_picker,
+                new String[]{"icon", "name"},
+                new int[]{R.id.pipPickerIcon, R.id.pipPickerName}) {
+            @Override
+            public android.view.View getView(int position, android.view.View convertView, android.view.ViewGroup parent) {
+                android.view.View v = super.getView(position, convertView, parent);
+                ImageView check = v.findViewById(R.id.pipPickerCheck);
+                boolean isSel = position == selected[0];
+                check.setVisibility(isSel ? android.view.View.VISIBLE : android.view.View.INVISIBLE);
+                check.setImageResource(isSel ? R.drawable.ic_check_circle : 0);
+                return v;
+            }
+        };
+
+        ListView listView = new ListView(mContext);
+        listView.setAdapter(adapter);
+        listView.setDividerHeight(1);
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            selected[0] = position;
+            adapter.notifyDataSetChanged();
+        });
+
+        Context dialogContext = MainActivity.instance != null ? MainActivity.instance : mContext;
+        new AlertDialog.Builder(dialogContext)
+                .setTitle("选择在二级画中画显示的软件")
+                .setView(listView)
+                .setPositiveButton("确定", (dialog, which) -> {
+                    ResolveInfo chosen = apps.get(selected[0]);
+                    String pkg = chosen.activityInfo.packageName;
+                    String label = chosen.loadLabel(mContext.getPackageManager()).toString();
+                    mSecondaryWindow.startMirror(pkg, label);
+                })
+                .setNegativeButton("取消", null)
+                .show();
+    }
+
+    /**
      * 在画中画窗口打开所选软件（镜像方案）：
      * 1. 先启动前台服务保活（避免授权流程中进程被杀）
      * 2. 发起 MediaProjection 录屏授权（MainActivity.onActivityResult 回调）
@@ -454,6 +564,11 @@ public class PipWindowManager {
         // 前台服务保持镜像稳定
         PipProjectionService.start(mContext);
 
+        // 同步 MediaProjection 给二级画中画
+        if (mSecondaryWindow != null) {
+            mSecondaryWindow.setMediaProjection(mMediaProjection);
+        }
+
         // 启动所选软件到前台（授权完成后，避免抢占授权页导致进程被回收）
         if (mCurrentPackage != null) {
             Intent launchIntent = mContext.getPackageManager().getLaunchIntentForPackage(mCurrentPackage);
@@ -498,6 +613,10 @@ public class PipWindowManager {
 
     /** 停止镜像，恢复地图视图 */
     public void stopMirror() {
+        // 关闭二级画中画（如有）
+        if (mSecondaryWindow != null) {
+            mSecondaryWindow.close();
+        }
         if (mVirtualDisplay != null) {
             try {
                 mVirtualDisplay.release();

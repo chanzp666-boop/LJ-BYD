@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 完整车控面板（仿迪友：空调/座椅/车辆全功能） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#E61A1A1A">
+
+    <!-- 顶部标题栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="20dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="车辆控制"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/ccpEnvText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="车内 25°C · PM2.5 内 12/外 35"
+            android:textColor="#AADDDDDD"
+            android:textSize="12sp"
+            android:layout_marginRight="12dp" />
+
+        <Button
+            android:id="@+id/ccpCloseBtn"
+            android:layout_width="40dp"
+            android:layout_height="36dp"
+            android:text="✕"
+            android:textSize="16sp"
+            android:background="@android:color/transparent"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <!-- 三栏：空调 / 座椅 / 车辆 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <!-- ============ 空调栏 ============ -->
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView style="@style/CcpSectionTitle" android:text="空调" />
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="AC 开关" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpAcToggle" android:text="开关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="温度" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpTempDown" android:text="−" />
+                    <TextView style="@style/CcpValue" android:id="@+id/ccpTempText" android:text="22°C" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpTempUp" android:text="+" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="风量" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpWindDown" android:text="−" />
+                    <TextView style="@style/CcpValue" android:id="@+id/ccpWindText" android:text="3 档" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpWindUp" android:text="+" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="风向" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpModeCycle" android:text="吹面/吹脚" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="循环" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpCirculate" android:text="内循环" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="压缩机" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpCompressor" android:text="关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="除霜" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpFrontDefrost" android:text="前" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpRearDefrost" android:text="后" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="通风/净化" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpVentilation" android:text="通风" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpAirClean" android:text="净化" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpAutoClean" android:text="自动" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ============ 座椅栏 ============ -->
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView style="@style/CcpSectionTitle" android:text="座椅" />
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="左通风" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpLeftVent" android:text="关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="右通风" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpRightVent" android:text="关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="左加热" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpLeftWarm" android:text="关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="右加热" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpRightWarm" android:text="关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="方向盘加热" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpSteeringWarm" android:text="关" />
+                </LinearLayout>
+
+                <TextView style="@style/CcpSectionTitle" android:text="天窗/遮阳帘" />
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="遮阳帘" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpSunshade" android:text="开/关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="天窗" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpSkylight" android:text="开/关" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ============ 车辆栏 ============ -->
+        <ScrollView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:padding="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView style="@style/CcpSectionTitle" android:text="能量" />
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="保电模式" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpSocMode" android:text="智能保电" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="动能回收" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpRecovery" android:text="标准" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="车窗" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpHalfWindow" android:text="半开" />
+                    <Button style="@style/CcpSmallBtn" android:id="@+id/ccpCloseWindow" android:text="全关" />
+                </LinearLayout>
+
+                <TextView style="@style/CcpSectionTitle" android:text="灯光/其他" />
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="日行灯" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpDayLight" android:text="关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="大灯" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpHeadLight" android:text="关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="无线充电" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpWireless" android:text="关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="后排显示" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpRearDisplay" android:text="关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="后备箱" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpBackDoor" android:text="开/关" />
+                </LinearLayout>
+
+                <LinearLayout style="@style/CcpRow">
+                    <TextView style="@style/CcpLabel" android:text="引擎声模拟" />
+                    <Button style="@style/CcpBtn" android:id="@+id/ccpEngineSound" android:text="关" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+</LinearLayout>

@@ -45,6 +45,19 @@
             android:textColor="#88FFFFFF"
             android:textSize="13sp" />
 
+        <!-- 二级画中画入口（双画中画模式开启时显示） -->
+        <TextView
+            android:id="@+id/pipAddWindowBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:text="＋画中画"
+            android:textColor="#FF55D6FF"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
         <!-- ⋮ 三点设置入口（选择画中画显示的软件） -->
         <ImageView
             android:id="@+id/pipSettingsBtn"

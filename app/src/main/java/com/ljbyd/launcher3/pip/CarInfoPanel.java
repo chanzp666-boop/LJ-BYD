@@ -205,6 +205,11 @@ public class CarInfoPanel {
             runCarCommand(mCarConfig.getBatteryMode(),
                     mForceBattery ? "已切换强制保电" : "已切换智能保电");
         });
+
+        // 完整车控面板入口（仿迪友全功能车控）
+        mRootView.findViewById(R.id.btnFullControl).setOnClickListener(v -> {
+            CarControlPanel.getInstance(mContext).toggle();
+        });
     }
 
     /** 刷新保电/回收 UI 状态 */
