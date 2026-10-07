@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:background="#EE2C2C2C">
+
+    <ImageView
+        android:id="@+id/pipPickerIcon"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:contentDescription="应用图标" />
+
+    <TextView
+        android:id="@+id/pipPickerName"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:paddingLeft="12dp"
+        android:textColor="#FFFFFFFF"
+        android:textSize="15sp" />
+
+    <ImageView
+        android:id="@+id/pipPickerCheck"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:contentDescription="已选择"
+        android:visibility="invisible" />
+</LinearLayout>

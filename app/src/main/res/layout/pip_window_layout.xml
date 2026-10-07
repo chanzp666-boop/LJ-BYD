@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 画中画悬浮窗布局（参考迪友桌面自由窗口画中画） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/dialog_background_rounded"
+    android:elevation="8dp">
+
+    <!-- 顶部控制栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#CC111111">
+
+        <!-- 关闭按钮 -->
+        <ImageView
+            android:id="@+id/pipCloseBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_close"
+            android:contentDescription="关闭画中画" />
+
+        <!-- 标题 -->
+        <TextView
+            android:id="@+id/pipTitle"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="画中画"
+            android:textColor="#FFFFFFFF"
+            android:textSize="16sp" />
+
+        <!-- 当前显示软件名 -->
+        <TextView
+            android:id="@+id/pipAppName"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text=""
+            android:textColor="#88FFFFFF"
+            android:textSize="13sp" />
+
+        <!-- ⋮ 三点设置入口（选择画中画显示的软件） -->
+        <ImageView
+            android:id="@+id/pipSettingsBtn"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:padding="12dp"
+            android:src="@drawable/ic_dots"
+            android:contentDescription="选择画中画显示的软件" />
+    </LinearLayout>
+
+    <!-- 内容区：地图(WebView) / 镜像(TextureView) -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#FF000000">
+
+        <!-- 默认地图视图（网页地图，同屏还原参考图右侧） -->
+        <WebView
+            android:id="@+id/pipWebView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <!-- 软件镜像视图（MediaProjection 录屏） -->
+        <TextureView
+            android:id="@+id/pipTextureView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- 底部状态栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="34dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="#CC111111"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp">
+
+        <TextView
+            android:id="@+id/pipStatusText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="点击 ⋮ 选择在画中画显示的软件"
+            android:textColor="#99FFFFFF"
+            android:textSize="12sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="三指下滑关闭"
+            android:textColor="#66FFFFFF"
+            android:textSize="12sp" />
+    </LinearLayout>
+</LinearLayout>

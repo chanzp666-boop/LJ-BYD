@@ -27,6 +27,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
+import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -123,6 +124,12 @@ import net.sourceforge.pinyin4j.format.exception.BadHanyuPinyinOutputFormatCombi
 public class MainActivity extends AppCompatActivity {
     // 广播Action常量
     public static final String ACTION_WALLPAPER_SETTINGS_CHANGED = "com.ljbyd.launcher3.WALLPAPER_SETTINGS_CHANGED";
+    /** 三指下滑切换画中画 */
+    public static final String ACTION_TOGGLE_PIP = "com.ljbyd.launcher3.action.TOGGLE_PIP";
+    /** 请求录屏授权（画中画镜像） */
+    public static final String ACTION_REQUEST_PROJECTION = "com.ljbyd.launcher3.action.REQUEST_PROJECTION";
+    /** 打开画中画应用选择弹窗（遥控/调试入口） */
+    public static final String ACTION_SHOW_APP_PICKER = "com.ljbyd.launcher3.action.SHOW_APP_PICKER";
 
     // 权限请求码常量
     private static final int REQUEST_CODE_OVERLAY_PERMISSION = 1001;
@@ -131,6 +138,14 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_STORAGE_PERMISSION = 1005;
     private static final int REQUEST_MANAGE_STORAGE = 1006;
     private static final int REQUEST_TTS_PERMISSION = 1008;
+    /** 画中画录屏授权 */
+    public static final int REQUEST_CODE_PIP_PROJECTION = 4001;
+
+    // ==================== 三指下滑手势（画中画开关） ====================
+    private float threeFingerStartY = -1f;
+    private long threeFingerStartTime = 0L;
+    private static final float THREE_FINGER_SLOP_DP = 120f;   // 下滑判定距离(dp)
+    private static final long THREE_FINGER_MAX_MS = 700L;     // 最长判定时长
 
     // ==================== 网络状态（蓝牙/WiFi 图标，对应原版 checkBluetoothStatus/checkWifiStatus） ====================
     private BluetoothAdapter bluetoothAdapter;
@@ -310,6 +325,19 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
         super.onCreate(savedInstanceState);
         instance = this;
+
+        // 画中画录屏授权请求（PipWindowManager 发起的）
+        if (getIntent() != null && ACTION_REQUEST_PROJECTION.equals(getIntent().getAction())) {
+            requestProjectionPermission();
+        }
+        // 画中画开关指令（onCreate 新实例场景）
+        if (getIntent() != null && ACTION_TOGGLE_PIP.equals(getIntent().getAction())) {
+            PipWindowManager.getInstance(this).toggle();
+        }
+        // 画中画应用选择弹窗（遥控/调试入口）
+        if (getIntent() != null && ACTION_SHOW_APP_PICKER.equals(getIntent().getAction())) {
+            PipWindowManager.getInstance(this).showAppPicker();
+        }
 
         // 初始化工具类
         initManager = new InitManager(this);
@@ -820,6 +848,94 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         backgroundImageView.setOnTouchListener((v, event) -> wallpaperGestureDetector.onTouchEvent(event));
+
+        // ==================== 三指下滑手势：开/关画中画 ====================
+        initThreeFingerGesture();
+        // 预创建画中画管理器（悬浮窗按需显示）
+        PipWindowManager.getInstance(this);
+    }
+
+    /**
+     * 三指下滑手势监听（挂在 decor view，三指事件拦截）
+     * 下滑 → 切换画中画开/关；不影响单指/双指手势
+     */
+    private void initThreeFingerGesture() {
+        final float slopPx = THREE_FINGER_SLOP_DP * getResources().getDisplayMetrics().density;
+        getWindow().getDecorView().setOnTouchListener((v, event) -> {
+            int pointerCount = event.getPointerCount();
+            if (pointerCount < 3) {
+                // 非三指：清残留状态
+                if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                    threeFingerStartY = -1f;
+                }
+                return false;
+            }
+            float avgY = 0f;
+            for (int i = 0; i < pointerCount; i++) {
+                avgY += event.getY(i);
+            }
+            avgY /= pointerCount;
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    if (threeFingerStartY < 0) {
+                        threeFingerStartY = avgY;
+                        threeFingerStartTime = System.currentTimeMillis();
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_POINTER_UP:
+                    if (threeFingerStartY >= 0) {
+                        long dt = System.currentTimeMillis() - threeFingerStartTime;
+                        float dy = avgY - threeFingerStartY;
+                        if (dt >= 80 && dt <= THREE_FINGER_MAX_MS && dy > slopPx) {
+                            Log.i("MainActivity", "三指下滑触发画中画切换");
+                            PipWindowManager.getInstance(MainActivity.this).toggle();
+                        }
+                        threeFingerStartY = -1f;
+                    }
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    threeFingerStartY = -1f;
+                    break;
+            }
+            return true; // 拦截三指事件
+        });
+    }
+
+    @Override
+    public void onConfigurationChanged(android.content.res.Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // 屏幕旋转/尺寸变化时，画中画与车辆信息区悬浮窗重新布局
+        PipWindowManager.getInstance(this).onDisplayMetricsChanged();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (intent != null) {
+            if (ACTION_TOGGLE_PIP.equals(intent.getAction())) {
+                Log.i("MainActivity", "收到画中画切换指令");
+                PipWindowManager.getInstance(this).toggle();
+            } else if (ACTION_REQUEST_PROJECTION.equals(intent.getAction())) {
+                requestProjectionPermission();
+            } else if (ACTION_SHOW_APP_PICKER.equals(intent.getAction())) {
+                PipWindowManager.getInstance(this).showAppPicker();
+            }
+        }
+    }
+
+    /**
+     * 发起画中画录屏授权（MediaProjection）
+     */
+    private void requestProjectionPermission() {
+        try {
+            MediaProjectionManager mpm = (MediaProjectionManager) getSystemService(MEDIA_PROJECTION_SERVICE);
+            startActivityForResult(mpm.createScreenCaptureIntent(), REQUEST_CODE_PIP_PROJECTION);
+        } catch (Exception e) {
+            Log.e("MainActivity", "发起录屏授权失败: " + e.getMessage());
+            Toast.makeText(this, "无法发起录屏授权", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void nextWallpaper() {
@@ -1276,6 +1392,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // 清理画中画镜像与悬浮窗
+        try {
+            PipWindowManager pip = PipWindowManager.getInstance(this);
+            pip.stopMirror();
+            pip.hide();
+        } catch (Exception ignored) {
+        }
         stopTimeUpdate();
         if (networkStateReceiver != null) {
             try { unregisterReceiver(networkStateReceiver); } catch (Exception ignored) { }
@@ -1305,7 +1428,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_OVERLAY_PERMISSION) {
+        if (requestCode == REQUEST_CODE_PIP_PROJECTION) {
+            // 画中画录屏授权结果 → 镜像所选软件
+            PipWindowManager.getInstance(this).onProjectionReady(resultCode, data);
+        } else if (requestCode == REQUEST_OVERLAY_PERMISSION) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
                 Toast.makeText(this, "悬浮窗权限未授予", Toast.LENGTH_SHORT).show();
             }

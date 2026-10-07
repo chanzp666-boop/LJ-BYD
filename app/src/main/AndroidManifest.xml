@@ -68,6 +68,21 @@
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
+    <!-- 无障碍服务（自愈保活+全局三指手势） -->
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+    <!-- 修改系统设置（车机数据/保电等，adb 授予） -->
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <!-- 特权电话状态（车机车辆数据，adb 授予） -->
+    <uses-permission
+        android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
+        tools:ignore="ProtectedPermissions" />
+    <!-- 应用使用统计（保活检测） -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
+
     <uses-feature android:name="android.software.home_launcher" />
     <application
         android:allowBackup="true"
@@ -113,6 +128,28 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <!-- 无障碍自愈服务（系统强保活，进程被杀后自动重启并回桌面） -->
+        <service
+            android:name="com.ljbyd.launcher3.service.AutoService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="垃圾比亚迪保活服务"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <!-- 画中画镜像前台服务 -->
+        <service
+            android:name="com.ljbyd.launcher3.service.PipProjectionService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
 
         <receiver
             android:name="com.ljbyd.launcher3.receiver.BootReceiver"
