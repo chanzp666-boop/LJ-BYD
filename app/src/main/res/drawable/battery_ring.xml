@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 背景圆环 -->
+    <item android:id="@android:id/background">
+        <shape android:shape="oval">
+            <solid android:color="#22FFFFFF" />
+        </shape>
+    </item>
+    <!-- 进度圆环（绿色） -->
+    <item android:id="@android:id/progress">
+        <rotate
+            android:fromDegrees="270"
+            android:toDegrees="270">
+            <shape
+                android:shape="ring"
+                android:innerRadiusRatio="2.8"
+                android:thickness="5dp"
+                android:useLevel="true">
+                <solid android:color="#4CAF50" />
+            </shape>
+        </rotate>
+    </item>
+</layer-list>

@@ -26,16 +26,20 @@ public class DesktopCardManager {
     /** 卡片 key 与名称 */
     public static final String CARD_MAP = "map";
     public static final String CARD_MUSIC = "music";
+    public static final String CARD_QUICK_CTRL = "quick_ctrl";
+    public static final String CARD_ENERGY = "energy";
     public static final String CARD_APPS = "apps";
     public static final String CARD_CAR = "car";
     public static final String CARD_WEATHER = "weather";
 
-    public static final String[] ALL_CARDS = {CARD_MAP, CARD_MUSIC, CARD_APPS, CARD_CAR, CARD_WEATHER};
+    public static final String[] ALL_CARDS = {CARD_MAP, CARD_MUSIC, CARD_QUICK_CTRL, CARD_ENERGY, CARD_APPS, CARD_CAR, CARD_WEATHER};
 
     public static String cardName(Context ctx, String key) {
         switch (key) {
             case CARD_MAP: return "地图导航";
             case CARD_MUSIC: return "音乐";
+            case CARD_QUICK_CTRL: return "便捷车控";
+            case CARD_ENERGY: return "能耗环";
             case CARD_APPS: return "快速应用";
             case CARD_CAR: return "车况胎压";
             case CARD_WEATHER: return "天气";
@@ -48,6 +52,8 @@ public class DesktopCardManager {
         switch (key) {
             case CARD_MAP: return R.id.mapWidget;
             case CARD_MUSIC: return R.id.musicWidget;
+            case CARD_QUICK_CTRL: return R.id.quickControlWidget;
+            case CARD_ENERGY: return R.id.energyWidget;
             case CARD_APPS: return R.id.quickAppsWidget;
             case CARD_CAR: return R.id.carWidget;
             case CARD_WEATHER: return R.id.weatherWidget;

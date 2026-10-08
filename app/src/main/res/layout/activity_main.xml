@@ -36,38 +36,103 @@
         android:paddingRight="20dp"
         android:background="@android:color/transparent">
 
-        <!-- 左侧时间显示 -->
+        <!-- 左侧车机信息：续航 / 电量条 / 电量% / 车内温度 / 坡度 / P挡 -->
         <TextView
-            android:id="@+id/topLeftTime"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="12sp"
-            android:textColor="#FFFFFF"
-            android:text="" />
-
-        <!-- 右侧信息 -->
-        <LinearLayout
+            android:id="@+id/topRangeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:text="630KM"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF" />
 
-            <ImageView
-                android:id="@+id/bluetoothIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/lanya"
-                android:contentDescription="@string/bluetooth_desc" />
+        <!-- 电量进度条 -->
+        <ProgressBar
+            android:id="@+id/topBatteryBar"
+            style="@android:style/Widget.ProgressBar.Horizontal"
+            android:layout_width="80dp"
+            android:layout_height="8dp"
+            android:layout_marginLeft="10dp"
+            android:max="100"
+            android:progress="85" />
 
-            <ImageView
-                android:id="@+id/wifiIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginLeft="15dp"
-                android:src="@drawable/wifi"
-                android:contentDescription="@string/wifi_desc" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/topBatteryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6dp"
+            android:text="85%"
+            android:textSize="13sp"
+            android:textColor="#4CAF50"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/topBatteryIcon"
+            android:layout_width="20dp"
+            android:layout_height="14dp"
+            android:layout_marginLeft="4dp"
+            android:src="@android:drawable/ic_menu_revert"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/topCarTempText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="车内温度 25℃"
+            android:textSize="13sp"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/topSlopeText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:text="坡度 3°"
+            android:textSize="13sp"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/topGearText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            background="@drawable/gear_p_bg"
+            android:text="P"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#FF55D6FF" />
+
+        <!-- 中间留白 -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <!-- 右侧：蓝牙 / WiFi / 信号 / 时间 -->
+        <ImageView
+            android:id="@+id/bluetoothIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/lanya"
+            android:contentDescription="@string/bluetooth_desc" />
+
+        <ImageView
+            android:id="@+id/wifiIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/wifi"
+            android:contentDescription="@string/wifi_desc" />
+
+        <TextView
+            android:id="@+id/topRightTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:text="00:30"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 
     <!-- 左侧布局：时间/日期/农历 -->
@@ -355,6 +420,187 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- ============ 便捷车控卡（仿迪友：4 圆形快捷按钮） ============ -->
+            <LinearLayout
+                android:id="@+id/quickControlWidget"
+                android:layout_width="240dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:background="@drawable/widget_group_background">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="便捷车控"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:alpha="0.8" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <LinearLayout
+                        android:id="@+id/quickCallBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="6dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/quick_circle_bg"
+                            android:padding="10dp"
+                            android:src="@android:drawable/ic_menu_call"
+                            android:contentDescription="电话" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/quickMailBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="6dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/quick_circle_bg"
+                            android:padding="10dp"
+                            android:src="@android:drawable/ic_dialog_email"
+                            android:contentDescription="邮件" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/quickFanBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="6dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/quick_circle_bg"
+                            android:padding="10dp"
+                            android:src="@android:drawable/ic_media_play"
+                            android:contentDescription="风扇" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/quickTrunkBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:padding="6dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/quick_circle_bg"
+                            android:padding="10dp"
+                            android:src="@android:drawable/ic_menu_delete"
+                            android:contentDescription="后备箱" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ============ 能耗环卡（仿迪友：里程+时长+能耗+环形电量） ============ -->
+            <LinearLayout
+                android:id="@+id/energyWidget"
+                android:layout_width="220dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="20dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp"
+                android:background="@drawable/widget_group_background">
+
+                <!-- 左侧文字数据 -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/energyRangeText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="70 km"
+                        android:textSize="18sp"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/energyTimeText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="1:08 h:min"
+                        android:textSize="12sp"
+                        android:textColor="#FFFFFF"
+                        android:alpha="0.85" />
+
+                    <TextView
+                        android:id="@+id/energyConsumeText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="7.8 L/100km"
+                        android:textSize="12sp"
+                        android:textColor="#FFFFFF"
+                        android:alpha="0.85" />
+                </LinearLayout>
+
+                <!-- 右侧绿色环形电量 -->
+                <FrameLayout
+                    android:layout_width="64dp"
+                    android:layout_height="64dp">
+
+                    <ProgressBar
+                        android:id="@+id/energyRingBattery"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:max="100"
+                        android:progress="85"
+                        android:progressDrawable="@drawable/battery_ring" />
+
+                    <TextView
+                        android:id="@+id/energyBatteryText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="85"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="#4CAF50" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal|bottom"
+                        android:layout_marginBottom="6dp"
+                        android:text="电量"
+                        android:textSize="9sp"
+                        android:textColor="#FFFFFF" />
+                </FrameLayout>
+            </LinearLayout>
+
             <!-- ============ 快速启动 App 组件 ============ -->
             <LinearLayout
                 android:id="@+id/quickAppsWidget"
@@ -393,7 +639,7 @@
                     android:id="@+id/carImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/nav_car"
+                    android:src="@drawable/nav_car_top"
                     android:contentDescription="@string/car_desc" />
 
                 <LinearLayout
@@ -407,7 +653,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="240kPa"
+                        android:text="2.4 bar"
                         android:textSize="10sp"
                         android:textColor="#FFFFFF"
                         android:gravity="start" />
@@ -417,7 +663,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="240kPa"
+                        android:text="2.4 bar"
                         android:textSize="10sp"
                         android:textColor="#FFFFFF"
                         android:gravity="end" />
@@ -433,7 +679,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="240kPa"
+                        android:text="2.4 bar"
                         android:textSize="10sp"
                         android:textColor="#FFFFFF"
                         android:gravity="start" />
@@ -443,7 +689,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="240kPa"
+                        android:text="2.4 bar"
                         android:textSize="10sp"
                         android:textColor="#FFFFFF"
                         android:gravity="end" />
@@ -632,6 +878,26 @@
                 android:layout_marginLeft="8dp"
                 android:src="@drawable/nav_ac_hcs"
                 android:contentDescription="@string/ac_hcs_desc" />
+
+            <!-- 座椅通风 -->
+            <ImageView
+                android:id="@+id/seatVentBtn"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="12dp"
+                android:src="@android:drawable/ic_media_play"
+                android:alpha="0.6"
+                android:contentDescription="座椅通风" />
+
+            <!-- 座椅加热 -->
+            <ImageView
+                android:id="@+id/seatHeatBtn"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:layout_marginLeft="8dp"
+                android:src="@android:drawable/ic_menu_revert"
+                android:alpha="0.6"
+                android:contentDescription="座椅加热" />
         </LinearLayout>
 
         <!-- 右侧按钮组 -->

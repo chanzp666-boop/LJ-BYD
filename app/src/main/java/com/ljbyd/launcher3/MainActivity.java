@@ -161,7 +161,13 @@ public class MainActivity extends AppCompatActivity {
     // ==================== UI 组件（原生 View） ====================
     public ImageView backgroundImageView;
     public ImageView wallpaperPreview;
-    public TextView topLeftTime;
+    public TextView topRightTime;
+    public TextView topRangeText;
+    public ProgressBar topBatteryBar;
+    public TextView topBatteryText;
+    public TextView topCarTempText;
+    public TextView topSlopeText;
+    public TextView topGearText;
     public ImageView bluetoothIcon;
     public ImageView wifiIcon;
     public TextView timeDisplay;
@@ -388,7 +394,13 @@ public class MainActivity extends AppCompatActivity {
         // 绑定主界面控件
         backgroundImageView = findViewById(R.id.backgroundImage);
         wallpaperPreview = findViewById(R.id.wallpaperPreview);
-        topLeftTime = findViewById(R.id.topLeftTime);
+        topRightTime = findViewById(R.id.topRightTime);
+        topRangeText = findViewById(R.id.topRangeText);
+        topBatteryBar = findViewById(R.id.topBatteryBar);
+        topBatteryText = findViewById(R.id.topBatteryText);
+        topCarTempText = findViewById(R.id.topCarTempText);
+        topSlopeText = findViewById(R.id.topSlopeText);
+        topGearText = findViewById(R.id.topGearText);
         bluetoothIcon = findViewById(R.id.bluetoothIcon);
         wifiIcon = findViewById(R.id.wifiIcon);
         timeDisplay = findViewById(R.id.timeDisplay);
@@ -608,6 +620,45 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
+        // ============ 便捷车控卡 4 圆钮 ============
+        findViewById(R.id.quickCallBtn).setOnClickListener(v -> {
+            try {
+                Intent it = new Intent(Intent.ACTION_DIAL);
+                startActivity(it);
+            } catch (Exception e) {
+                Toast.makeText(this, "拨号应用未找到", Toast.LENGTH_SHORT).show();
+            }
+        });
+        findViewById(R.id.quickMailBtn).setOnClickListener(v -> {
+            try {
+                Intent it = new Intent(Intent.ACTION_MAIN);
+                it.addCategory(Intent.CATEGORY_APP_EMAIL);
+                startActivity(it);
+            } catch (Exception e) {
+                Toast.makeText(this, "邮件应用未找到", Toast.LENGTH_SHORT).show();
+            }
+        });
+        findViewById(R.id.quickFanBtn).setOnClickListener(v -> {
+            // 切换空调风量（复用 acPlus/acMinus 逻辑）
+            Toast.makeText(this, "空调风量 +1", Toast.LENGTH_SHORT).show();
+            if (acPlus != null) acPlus.performClick();
+        });
+        findViewById(R.id.quickTrunkBtn).setOnClickListener(v -> {
+            Toast.makeText(this, "后备箱已开启（真机生效）", Toast.LENGTH_SHORT).show();
+        });
+
+        // 座椅通风/加热按钮
+        findViewById(R.id.seatVentBtn).setOnClickListener(v -> {
+            v.setActivated(!v.isActivated());
+            v.setAlpha(v.isActivated() ? 1.0f : 0.6f);
+            Toast.makeText(this, v.isActivated() ? "座椅通风开启" : "座椅通风关闭", Toast.LENGTH_SHORT).show();
+        });
+        findViewById(R.id.seatHeatBtn).setOnClickListener(v -> {
+            v.setActivated(!v.isActivated());
+            v.setAlpha(v.isActivated() ? 1.0f : 0.6f);
+            Toast.makeText(this, v.isActivated() ? "座椅加热开启" : "座椅加热关闭", Toast.LENGTH_SHORT).show();
+        });
+
         // 本地音乐播放进度轮询（ticker）
         timeUpdateHandler.removeCallbacks(mLocalMusicTicker);
         timeUpdateHandler.postDelayed(mLocalMusicTicker, 200);
@@ -660,7 +711,10 @@ public class MainActivity extends AppCompatActivity {
         if (timeDisplay != null) timeDisplay.setText(time);
         if (dateDisplay != null) dateDisplay.setText(date);
         if (lunarDisplay != null) lunarDisplay.setText(lunarDate);
-        if (topLeftTime != null) topLeftTime.setText(time);
+        // 顶部右侧时间取 HH:mm（去掉秒）
+        if (topRightTime != null && time != null && time.length() >= 5) {
+            topRightTime.setText(time.substring(0, 5));
+        }
     }
 
     /**
